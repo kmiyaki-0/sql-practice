@@ -4,9 +4,284 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>SQL Practice</title>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #0d1117;
+      color: #e6edf3;
+      margin: 0;
+      padding: 30px;
+    }
+
+    .container {
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+
+    h1 {
+      color: #58a6ff;
+    }
+
+    .question {
+      background: #161b22;
+      padding: 20px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+    }
+
+    textarea {
+      width: 100%;
+      height: 160px;
+      background: #0d1117;
+      color: #e6edf3;
+      border: 1px solid #30363d;
+      border-radius: 6px;
+      padding: 15px;
+      font-size: 16px;
+      box-sizing: border-box;
+      font-family: monospace;
+    }
+
+    button {
+      margin-top: 10px;
+      padding: 12px 24px;
+      background: #238636;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+
+    button:hover {
+      background: #2ea043;
+    }
+
+    #status {
+      margin-top: 15px;
+      color: #8b949e;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+      background: #161b22;
+    }
+
+    th,
+    td {
+      border: 1px solid #30363d;
+      padding: 10px;
+      text-align: left;
+    }
+
+    th {
+      background: #21262d;
+      color: #58a6ff;
+    }
+
+    .error {
+      color: #ff7b72;
+    }
+
+    .success {
+      color: #3fb950;
+    }
+  </style>
 </head>
+
 <body>
+
+<div class="container">
+
   <h1>SQL Practice</h1>
-  <p>SkillScope SQL練習環境</p>
+
+  <div class="question">
+    <h2>問題 1</h2>
+    <p>users テーブルの全データを取得してください。</p>
+
+    <p>テーブル：</p>
+
+    <pre>
+users
+-------------------------
+id | name   | age
+1  | Taro   | 25
+2  | Hanako | 30
+3  | Ken    | 19
+    </pre>
+  </div>
+
+  <h2>SQL入力</h2>
+
+  <textarea id="sqlInput">SELECT * FROM users;</textarea>
+
+  <br>
+
+  <button id="runButton">SQLを実行</button>
+  <button id="resetButton">DBをリセット</button>
+
+  <div id="status">SQLiteを読み込み中...</div>
+
+  <h2>実行結果</h2>
+
+  <div id="result"></div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/sql.js@1.10.3/dist/sql-wasm.js"></script>
+
+<script>
+  let db;
+
+  async function initializeDatabase() {
+
+    const SQL = await initSqlJs({
+      locateFile: file =>
+        `https://cdn.jsdelivr.net/npm/sql.js@1.10.3/dist/${file}`
+    });
+
+    db = new SQL.Database();
+
+    db.run(`
+      CREATE TABLE users (
+        id INTEGER PRIMARY KEY,
+        name TEXT,
+        age INTEGER
+      );
+
+      INSERT INTO users (name, age) VALUES
+        ('Taro', 25),
+        ('Hanako', 30),
+        ('Ken', 19);
+    `);
+
+    document.getElementById("status").textContent =
+      "SQLite準備完了";
+
+    document.getElementById("status").className =
+      "success";
+  }
+
+
+  function runSQL() {
+
+    const sql =
+      document.getElementById("sqlInput").value;
+
+    const resultDiv =
+      document.getElementById("result");
+
+    const status =
+      document.getElementById("status");
+
+    resultDiv.innerHTML = "";
+
+    try {
+
+      const results = db.exec(sql);
+
+      if (results.length === 0) {
+
+        resultDiv.innerHTML =
+          "<p>SQLは正常に実行されました。</p>";
+
+        return;
+      }
+
+      results.forEach(result => {
+
+        const table =
+          document.createElement("table");
+
+        const header =
+          document.createElement("tr");
+
+        result.columns.forEach(column => {
+
+          const th =
+            document.createElement("th");
+
+          th.textContent = column;
+
+          header.appendChild(th);
+
+        });
+
+        table.appendChild(header);
+
+        result.values.forEach(row => {
+
+          const tr =
+            document.createElement("tr");
+
+          row.forEach(value => {
+
+            const td =
+              document.createElement("td");
+
+            td.textContent =
+              value === null ? "NULL" : value;
+
+            tr.appendChild(td);
+
+          });
+
+          table.appendChild(tr);
+
+        });
+
+        resultDiv.appendChild(table);
+
+      });
+
+      status.textContent =
+        "SQLを実行しました";
+
+      status.className =
+        "success";
+
+    } catch (error) {
+
+      status.textContent =
+        "SQLエラー";
+
+      status.className =
+        "error";
+
+      resultDiv.innerHTML =
+        `<p class="error">${error.message}</p>`;
+    }
+  }
+
+
+  async function resetDatabase() {
+
+    document.getElementById("status").textContent =
+      "DBをリセット中...";
+
+    document.getElementById("result").innerHTML =
+      "";
+
+    await initializeDatabase();
+  }
+
+
+  document
+    .getElementById("runButton")
+    .addEventListener("click", runSQL);
+
+
+  document
+    .getElementById("resetButton")
+    .addEventListener("click", resetDatabase);
+
+
+  initializeDatabase();
+
+</script>
+
 </body>
 </html>
