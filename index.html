@@ -3,7 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SQL Practice</title>
+
+  <title>SQL Practice | SkillScope</title>
 
   <style>
     * {
@@ -12,16 +13,24 @@
 
     body {
       margin: 0;
-      font-family: Arial, sans-serif;
+      font-family:
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        sans-serif;
       background: #0d1117;
       color: #e6edf3;
     }
 
     .app {
       display: grid;
-      grid-template-columns: 260px 1fr;
+      grid-template-columns: 280px 1fr;
       min-height: 100vh;
     }
+
+    /* =========================
+       サイドバー
+    ========================= */
 
     .sidebar {
       background: #161b22;
@@ -30,21 +39,23 @@
     }
 
     .sidebar h1 {
+      margin-top: 0;
+      margin-bottom: 5px;
       color: #58a6ff;
       font-size: 24px;
-      margin-top: 0;
     }
 
-    .sidebar p {
+    .subtitle {
       color: #8b949e;
       font-size: 14px;
+      margin-top: 0;
     }
 
     .question-list {
       display: flex;
       flex-direction: column;
       gap: 8px;
-      margin-top: 20px;
+      margin-top: 25px;
     }
 
     .question-button {
@@ -56,10 +67,12 @@
       border-radius: 6px;
       text-align: left;
       cursor: pointer;
+      transition: 0.15s;
     }
 
     .question-button:hover {
       background: #21262d;
+      border-color: #8b949e;
     }
 
     .question-button.active {
@@ -69,24 +82,46 @@
 
     .question-button.correct {
       border-color: #3fb950;
+      color: #3fb950;
     }
+
+    .progress {
+      margin-top: 25px;
+      padding: 12px;
+      background: #0d1117;
+      border: 1px solid #30363d;
+      border-radius: 6px;
+      color: #8b949e;
+      font-size: 14px;
+    }
+
+    /* =========================
+       メイン
+    ========================= */
 
     .main {
       padding: 30px;
-      max-width: 1100px;
+      max-width: 1200px;
       width: 100%;
+      margin: 0 auto;
     }
 
     .question-card {
       background: #161b22;
       border: 1px solid #30363d;
-      padding: 20px;
+      padding: 22px;
       border-radius: 8px;
-      margin-bottom: 20px;
+      margin-bottom: 25px;
     }
 
     .question-card h2 {
       margin-top: 0;
+      color: #f0f6fc;
+    }
+
+    .question-card h3 {
+      margin-top: 25px;
+      color: #c9d1d9;
     }
 
     .schema {
@@ -96,20 +131,46 @@
       border-radius: 6px;
       overflow-x: auto;
       color: #c9d1d9;
+      line-height: 1.5;
+    }
+
+    /* =========================
+       SQLエディタ
+    ========================= */
+
+    .editor-title {
+      margin-top: 0;
     }
 
     textarea {
       width: 100%;
-      min-height: 180px;
+      min-height: 200px;
       resize: vertical;
       background: #0d1117;
       color: #e6edf3;
       border: 1px solid #30363d;
       border-radius: 6px;
       padding: 15px;
-      font-family: Consolas, monospace;
+
+      font-family:
+        Consolas,
+        Monaco,
+        "Courier New",
+        monospace;
+
       font-size: 16px;
+      line-height: 1.5;
     }
+
+    textarea:focus {
+      outline: none;
+      border-color: #58a6ff;
+      box-shadow: 0 0 0 2px rgba(88, 166, 255, 0.15);
+    }
+
+    /* =========================
+       ボタン
+    ========================= */
 
     .buttons {
       display: flex;
@@ -125,6 +186,12 @@
       cursor: pointer;
       color: white;
       font-size: 15px;
+      font-weight: 600;
+      transition: 0.15s;
+    }
+
+    button.action:hover {
+      filter: brightness(1.1);
     }
 
     #runButton {
@@ -138,6 +205,10 @@
     #resetButton {
       background: #6e7681;
     }
+
+    /* =========================
+       メッセージ
+    ========================= */
 
     .message {
       margin-top: 18px;
@@ -167,8 +238,16 @@
       color: #79c0ff;
     }
 
+    /* =========================
+       実行結果
+    ========================= */
+
     .result-area {
-      margin-top: 25px;
+      margin-top: 30px;
+    }
+
+    .result-wrapper {
+      overflow-x: auto;
     }
 
     table {
@@ -183,6 +262,7 @@
       border: 1px solid #30363d;
       padding: 10px;
       text-align: left;
+      white-space: nowrap;
     }
 
     th {
@@ -190,10 +270,13 @@
       color: #58a6ff;
     }
 
-    .progress {
-      margin-top: 20px;
-      color: #8b949e;
+    tr:hover td {
+      background: #1c2128;
     }
+
+    /* =========================
+       スマホ対応
+    ========================= */
 
     @media (max-width: 800px) {
       .app {
@@ -216,28 +299,63 @@
 
 <div class="app">
 
+  <!-- =========================
+       左：問題一覧
+  ========================== -->
+
   <aside class="sidebar">
+
     <h1>SQL Practice</h1>
-    <p>SkillScope SQL練習環境</p>
 
-    <div id="questionList" class="question-list"></div>
+    <p class="subtitle">
+      SkillScope SQL練習環境
+    </p>
 
-    <div id="progress" class="progress">
+    <div
+      id="questionList"
+      class="question-list"
+    >
+      読み込み中...
+    </div>
+
+    <div
+      id="progress"
+      class="progress"
+    >
       正解数: 0 / 0
     </div>
+
   </aside>
+
+
+  <!-- =========================
+       右：問題・SQL入力
+  ========================== -->
 
   <main class="main">
 
     <div class="question-card">
-      <h2 id="questionTitle"></h2>
+
+      <h2 id="questionTitle">
+        問題を読み込み中...
+      </h2>
+
       <p id="questionText"></p>
 
       <h3>使用テーブル</h3>
-      <pre id="schema" class="schema"></pre>
+
+      <pre
+        id="schema"
+        class="schema"
+      ></pre>
+
     </div>
 
-    <h2>SQLを書く</h2>
+
+    <h2 class="editor-title">
+      SQLを書く
+    </h2>
+
 
     <textarea
       id="sqlInput"
@@ -245,25 +363,48 @@
       placeholder="ここにSQLを書いてください"
     ></textarea>
 
+
     <div class="buttons">
-      <button id="runButton" class="action">
+
+      <button
+        id="runButton"
+        class="action"
+      >
         SQLを実行
       </button>
 
-      <button id="judgeButton" class="action">
+      <button
+        id="judgeButton"
+        class="action"
+      >
         正解判定
       </button>
 
-      <button id="resetButton" class="action">
+      <button
+        id="resetButton"
+        class="action"
+      >
         入力をリセット
       </button>
+
     </div>
 
-    <div id="message" class="message"></div>
+
+    <div
+      id="message"
+      class="message"
+    ></div>
+
 
     <div class="result-area">
+
       <h2>実行結果</h2>
-      <div id="result"></div>
+
+      <div
+        id="result"
+        class="result-wrapper"
+      ></div>
+
     </div>
 
   </main>
@@ -271,333 +412,311 @@
 </div>
 
 
-<script src="https://cdn.jsdelivr.net/npm/sql.js@1.10.3/dist/sql-wasm.js"></script>
+<!-- =========================
+     sql.js
+========================== -->
+
+<script
+  src="https://cdn.jsdelivr.net/npm/sql.js@1.10.3/dist/sql-wasm.js"
+></script>
+
 
 <script>
 
+  // ==========================================
+  // グローバル変数
+  // ==========================================
+
   let SQL;
+
+  let questions = [];
 
   let currentQuestionIndex = 0;
 
   const solvedQuestions = new Set();
 
 
-  // ==============================
-  // 問題データ
-  // ==============================
-
-  const questions = [
-
-    {
-      title: "問題1：SELECT 基礎",
-
-      text:
-        "users テーブルのすべての列・すべての行を取得してください。",
-
-      starter:
-        "SELECT *\nFROM users",
-
-      answer:
-        "SELECT * FROM users",
-
-      schema:
-`users
--------------------------
-id | name   | age
-1  | Taro   | 25
-2  | Hanako | 30
-3  | Ken    | 19
-4  | Yuki   | 22`
-    },
-
-    {
-      title: "問題2：WHERE",
-
-      text:
-        "users テーブルから、age が20以上のユーザーを取得してください。",
-
-      starter:
-        "SELECT *\nFROM users\nWHERE ",
-
-      answer:
-        "SELECT * FROM users WHERE age >= 20",
-
-      schema:
-`users
--------------------------
-id | name   | age
-1  | Taro   | 25
-2  | Hanako | 30
-3  | Ken    | 19
-4  | Yuki   | 22`
-    },
-
-    {
-      title: "問題3：ORDER BY",
-
-      text:
-        "users テーブルを age の高い順に並べてください。",
-
-      starter:
-        "SELECT *\nFROM users\nORDER BY ",
-
-      answer:
-        "SELECT * FROM users ORDER BY age DESC",
-
-      schema:
-`users
--------------------------
-id | name   | age
-1  | Taro   | 25
-2  | Hanako | 30
-3  | Ken    | 19
-4  | Yuki   | 22`
-    },
-
-    {
-      title: "問題4：COUNT",
-
-      text:
-        "users テーブルに何人のユーザーがいるか取得してください。列名は count にしてください。",
-
-      starter:
-        "SELECT ",
-
-      answer:
-        "SELECT COUNT(*) AS count FROM users",
-
-      schema:
-`users
--------------------------
-id | name   | age
-1  | Taro   | 25
-2  | Hanako | 30
-3  | Ken    | 19
-4  | Yuki   | 22`
-    },
-
-    {
-      title: "問題5：JOIN",
-
-      text:
-        "注文したユーザー名、商品名、金額を取得してください。orders.id の昇順で並べてください。",
-
-      starter:
-`SELECT
-FROM users
-JOIN orders
-  ON `,
-
-      answer:
-`SELECT users.name, orders.product, orders.amount
-FROM users
-JOIN orders
-ON users.id = orders.user_id
-ORDER BY orders.id`,
-
-      schema:
-`users
--------------------------
-id | name   | age
-1  | Taro   | 25
-2  | Hanako | 30
-3  | Ken    | 19
-4  | Yuki   | 22
-
-
-orders
-----------------------------------
-id | user_id | product    | amount
-1  | 1       | Keyboard   | 8000
-2  | 2       | Mouse      | 3000
-3  | 1       | Monitor    | 25000
-4  | 4       | Headphones | 12000`
-    },
-
-    {
-      title: "問題6：GROUP BY",
-
-      text:
-        "ユーザーごとの注文金額合計を取得してください。name と total を表示し、total の高い順に並べてください。",
-
-      starter:
-`SELECT
-FROM users
-JOIN orders
-  ON
-GROUP BY
-ORDER BY `,
-
-      answer:
-`SELECT users.name, SUM(orders.amount) AS total
-FROM users
-JOIN orders
-ON users.id = orders.user_id
-GROUP BY users.id, users.name
-ORDER BY total DESC`,
-
-      schema:
-`users
--------------------------
-id | name   | age
-1  | Taro   | 25
-2  | Hanako | 30
-3  | Ken    | 19
-4  | Yuki   | 22
-
-
-orders
-----------------------------------
-id | user_id | product    | amount
-1  | 1       | Keyboard   | 8000
-2  | 2       | Mouse      | 3000
-3  | 1       | Monitor    | 25000
-4  | 4       | Headphones | 12000`
-    }
-
-  ];
-
-
-  // ==============================
+  // ==========================================
   // SQLite DB作成
-  // ==============================
+  //
+  // SQL実行のたびに新しいDBを作成する。
+  // DROPやUPDATEを実行されても、
+  // 次回は元のDBに戻る。
+  // ==========================================
 
   function createDatabase() {
 
     const db = new SQL.Database();
 
+
     db.run(`
+
       CREATE TABLE users (
+
         id INTEGER PRIMARY KEY,
+
         name TEXT NOT NULL,
+
         age INTEGER NOT NULL
+
       );
 
-      INSERT INTO users (id, name, age) VALUES
+
+      INSERT INTO users
+        (id, name, age)
+      VALUES
+
         (1, 'Taro', 25),
+
         (2, 'Hanako', 30),
+
         (3, 'Ken', 19),
+
         (4, 'Yuki', 22);
 
 
       CREATE TABLE orders (
+
         id INTEGER PRIMARY KEY,
+
         user_id INTEGER NOT NULL,
+
         product TEXT NOT NULL,
+
         amount INTEGER NOT NULL
+
       );
+
 
       INSERT INTO orders
         (id, user_id, product, amount)
       VALUES
+
         (1, 1, 'Keyboard', 8000),
+
         (2, 2, 'Mouse', 3000),
+
         (3, 1, 'Monitor', 25000),
+
         (4, 4, 'Headphones', 12000);
+
     `);
+
 
     return db;
   }
 
 
-  // ==============================
-  // SQL.js初期化
-  // ==============================
+  // ==========================================
+  // 初期化
+  // ==========================================
 
   async function initialize() {
 
-    SQL = await initSqlJs({
+    try {
 
-      locateFile: file =>
-        `https://cdn.jsdelivr.net/npm/sql.js@1.10.3/dist/${file}`
+      showMessage(
+        "SQL練習環境を読み込み中...",
+        "info"
+      );
 
-    });
 
-    renderQuestionList();
+      // sql.js 読み込み
+      SQL = await initSqlJs({
 
-    loadQuestion(0);
+        locateFile: file =>
 
-    updateProgress();
+          `https://cdn.jsdelivr.net/npm/sql.js@1.10.3/dist/${file}`
+
+      });
+
+
+      // questions.json 読み込み
+      const response =
+        await fetch("./questions.json");
+
+
+      if (!response.ok) {
+
+        throw new Error(
+          `questions.json の読み込みに失敗しました（${response.status}）`
+        );
+
+      }
+
+
+      questions =
+        await response.json();
+
+
+      if (
+        !Array.isArray(questions) ||
+        questions.length === 0
+      ) {
+
+        throw new Error(
+          "questions.json に問題が登録されていません。"
+        );
+
+      }
+
+
+      // 最初の問題を表示
+      renderQuestionList();
+
+      loadQuestion(0);
+
+      updateProgress();
+
+      hideMessage();
+
+    }
+
+    catch (error) {
+
+      console.error(error);
+
+
+      document.getElementById(
+        "questionTitle"
+      ).textContent =
+        "読み込みエラー";
+
+
+      document.getElementById(
+        "questionText"
+      ).textContent =
+        "問題データを読み込めませんでした。";
+
+
+      showMessage(
+        `初期化エラー: ${error.message}`,
+        "error"
+      );
+
+    }
 
   }
 
 
-  // ==============================
+  // ==========================================
   // 問題一覧
-  // ==============================
+  // ==========================================
 
   function renderQuestionList() {
 
     const list =
-      document.getElementById("questionList");
+      document.getElementById(
+        "questionList"
+      );
+
 
     list.innerHTML = "";
 
-    questions.forEach((question, index) => {
 
-      const button =
-        document.createElement("button");
+    questions.forEach(
+      (question, index) => {
 
-      button.className =
-        "question-button";
+        const button =
+          document.createElement(
+            "button"
+          );
 
-      if (index === currentQuestionIndex) {
-        button.classList.add("active");
+
+        button.className =
+          "question-button";
+
+
+        if (
+          index ===
+          currentQuestionIndex
+        ) {
+
+          button.classList.add(
+            "active"
+          );
+
+        }
+
+
+        if (
+          solvedQuestions.has(index)
+        ) {
+
+          button.classList.add(
+            "correct"
+          );
+
+        }
+
+
+        button.textContent =
+
+          `${solvedQuestions.has(index) ? "✓ " : ""}${question.title}`;
+
+
+        button.addEventListener(
+
+          "click",
+
+          () => {
+
+            loadQuestion(index);
+
+          }
+
+        );
+
+
+        list.appendChild(button);
+
       }
-
-      if (solvedQuestions.has(index)) {
-        button.classList.add("correct");
-      }
-
-      button.textContent =
-        `${solvedQuestions.has(index) ? "✓ " : ""}${question.title}`;
-
-      button.addEventListener(
-        "click",
-        () => loadQuestion(index)
-      );
-
-      list.appendChild(button);
-
-    });
+    );
 
   }
 
 
-  // ==============================
-  // 問題読み込み
-  // ==============================
+  // ==========================================
+  // 問題を表示
+  // ==========================================
 
   function loadQuestion(index) {
 
     currentQuestionIndex = index;
 
+
     const question =
       questions[index];
+
 
     document.getElementById(
       "questionTitle"
     ).textContent =
       question.title;
 
+
     document.getElementById(
       "questionText"
     ).textContent =
       question.text;
+
 
     document.getElementById(
       "schema"
     ).textContent =
       question.schema;
 
+
     document.getElementById(
       "sqlInput"
     ).value =
-      question.starter;
+      question.starter || "";
+
 
     document.getElementById(
       "result"
     ).innerHTML = "";
+
 
     hideMessage();
 
@@ -606,16 +725,29 @@ id | user_id | product    | amount
   }
 
 
-  // ==============================
+  // ==========================================
   // SQL実行
-  // ==============================
+  // ==========================================
 
   function runSQL() {
+
+    if (!SQL) {
+
+      showMessage(
+        "SQLiteを読み込み中です。",
+        "error"
+      );
+
+      return;
+
+    }
+
 
     const sql =
       document.getElementById(
         "sqlInput"
       ).value.trim();
+
 
     if (!sql) {
 
@@ -628,15 +760,19 @@ id | user_id | product    | amount
 
     }
 
+
     const db =
       createDatabase();
+
 
     try {
 
       const results =
         db.exec(sql);
 
+
       displayResults(results);
+
 
       showMessage(
         "SQLを実行しました。",
@@ -650,6 +786,7 @@ id | user_id | product    | amount
       document.getElementById(
         "result"
       ).innerHTML = "";
+
 
       showMessage(
         `SQLエラー: ${error.message}`,
@@ -667,16 +804,29 @@ id | user_id | product    | amount
   }
 
 
-  // ==============================
+  // ==========================================
   // 正解判定
-  // ==============================
+  // ==========================================
 
   function judgeSQL() {
+
+    if (!SQL) {
+
+      showMessage(
+        "SQLiteを読み込み中です。",
+        "error"
+      );
+
+      return;
+
+    }
+
 
     const sql =
       document.getElementById(
         "sqlInput"
       ).value.trim();
+
 
     if (!sql) {
 
@@ -689,26 +839,43 @@ id | user_id | product    | amount
 
     }
 
+
     const question =
-      questions[currentQuestionIndex];
+      questions[
+        currentQuestionIndex
+      ];
+
 
     const userDB =
       createDatabase();
 
+
     const answerDB =
       createDatabase();
 
+
     try {
 
+      // ユーザーが書いたSQL
       const userResult =
         userDB.exec(sql);
 
+
+      // questions.jsonの模範解答
       const answerResult =
-        answerDB.exec(question.answer);
+        answerDB.exec(
+          question.answer
+        );
 
-      displayResults(userResult);
+
+      // ユーザーの実行結果を表示
+      displayResults(
+        userResult
+      );
 
 
+      // SQL文ではなく
+      // 実行結果を比較
       if (
         compareResults(
           userResult,
@@ -720,10 +887,12 @@ id | user_id | product    | amount
           currentQuestionIndex
         );
 
+
         showMessage(
           "正解です！ 🎉",
           "success"
         );
+
 
         renderQuestionList();
 
@@ -744,6 +913,11 @@ id | user_id | product    | amount
 
     catch (error) {
 
+      document.getElementById(
+        "result"
+      ).innerHTML = "";
+
+
       showMessage(
         `SQLエラー: ${error.message}`,
         "error"
@@ -754,6 +928,7 @@ id | user_id | product    | amount
     finally {
 
       userDB.close();
+
       answerDB.close();
 
     }
@@ -761,20 +936,23 @@ id | user_id | product    | amount
   }
 
 
-  // ==============================
-  // 結果比較
-  // ==============================
+  // ==========================================
+  // 実行結果比較
+  // ==========================================
 
   function compareResults(
     userResults,
     answerResults
   ) {
 
+    // SELECT結果の数が違う
     if (
       userResults.length !==
       answerResults.length
     ) {
+
       return false;
+
     }
 
 
@@ -787,35 +965,61 @@ id | user_id | product    | amount
       const user =
         userResults[i];
 
+
       const answer =
         answerResults[i];
 
 
+      // 列名比較
       if (
-        JSON.stringify(user.columns) !==
-        JSON.stringify(answer.columns)
+
+        JSON.stringify(
+          user.columns
+        )
+
+        !==
+
+        JSON.stringify(
+          answer.columns
+        )
+
       ) {
+
         return false;
+
       }
 
 
+      // 値比較
       if (
-        JSON.stringify(user.values) !==
-        JSON.stringify(answer.values)
+
+        JSON.stringify(
+          user.values
+        )
+
+        !==
+
+        JSON.stringify(
+          answer.values
+        )
+
       ) {
+
         return false;
+
       }
 
     }
+
 
     return true;
 
   }
 
 
-  // ==============================
-  // 結果表示
-  // ==============================
+  // ==========================================
+  // 実行結果表示
+  // ==========================================
 
   function displayResults(results) {
 
@@ -824,10 +1028,13 @@ id | user_id | product    | amount
         "result"
       );
 
+
     resultDiv.innerHTML = "";
 
 
-    if (results.length === 0) {
+    if (
+      results.length === 0
+    ) {
 
       resultDiv.textContent =
         "SQLは正常に実行されました。";
@@ -837,101 +1044,161 @@ id | user_id | product    | amount
     }
 
 
-    results.forEach(result => {
+    results.forEach(
+      result => {
 
-      const table =
-        document.createElement("table");
-
-
-      const thead =
-        document.createElement("thead");
-
-      const headerRow =
-        document.createElement("tr");
+        const table =
+          document.createElement(
+            "table"
+          );
 
 
-      result.columns.forEach(column => {
-
-        const th =
-          document.createElement("th");
-
-        th.textContent =
-          column;
-
-        headerRow.appendChild(th);
-
-      });
+        // ヘッダー
+        const thead =
+          document.createElement(
+            "thead"
+          );
 
 
-      thead.appendChild(headerRow);
-
-      table.appendChild(thead);
-
-
-      const tbody =
-        document.createElement("tbody");
+        const headerRow =
+          document.createElement(
+            "tr"
+          );
 
 
-      result.values.forEach(row => {
+        result.columns.forEach(
+          column => {
 
-        const tr =
-          document.createElement("tr");
-
-
-        row.forEach(value => {
-
-          const td =
-            document.createElement("td");
-
-          td.textContent =
-            value === null
-              ? "NULL"
-              : value;
-
-          tr.appendChild(td);
-
-        });
+            const th =
+              document.createElement(
+                "th"
+              );
 
 
-        tbody.appendChild(tr);
+            th.textContent =
+              column;
 
-      });
+
+            headerRow.appendChild(
+              th
+            );
+
+          }
+        );
 
 
-      table.appendChild(tbody);
+        thead.appendChild(
+          headerRow
+        );
 
-      resultDiv.appendChild(table);
 
-    });
+        table.appendChild(
+          thead
+        );
+
+
+        // データ
+        const tbody =
+          document.createElement(
+            "tbody"
+          );
+
+
+        result.values.forEach(
+          row => {
+
+            const tr =
+              document.createElement(
+                "tr"
+              );
+
+
+            row.forEach(
+              value => {
+
+                const td =
+                  document.createElement(
+                    "td"
+                  );
+
+
+                td.textContent =
+
+                  value === null
+
+                    ? "NULL"
+
+                    : value;
+
+
+                tr.appendChild(
+                  td
+                );
+
+              }
+            );
+
+
+            tbody.appendChild(
+              tr
+            );
+
+          }
+        );
+
+
+        table.appendChild(
+          tbody
+        );
+
+
+        resultDiv.appendChild(
+          table
+        );
+
+      }
+    );
 
   }
 
 
-  // ==============================
-  // リセット
-  // ==============================
+  // ==========================================
+  // SQL入力リセット
+  // ==========================================
 
   function resetInput() {
+
+    if (
+      questions.length === 0
+    ) {
+
+      return;
+
+    }
+
 
     document.getElementById(
       "sqlInput"
     ).value =
+
       questions[
         currentQuestionIndex
-      ].starter;
+      ].starter || "";
+
 
     document.getElementById(
       "result"
     ).innerHTML = "";
+
 
     hideMessage();
 
   }
 
 
-  // ==============================
-  // メッセージ
-  // ==============================
+  // ==========================================
+  // メッセージ表示
+  // ==========================================
 
   function showMessage(
     text,
@@ -943,8 +1210,10 @@ id | user_id | product    | amount
         "message"
       );
 
+
     message.textContent =
       text;
+
 
     message.className =
       `message ${type}`;
@@ -959,7 +1228,10 @@ id | user_id | product    | amount
         "message"
       );
 
-    message.textContent = "";
+
+    message.textContent =
+      "";
+
 
     message.className =
       "message";
@@ -967,23 +1239,24 @@ id | user_id | product    | amount
   }
 
 
-  // ==============================
-  // 進捗
-  // ==============================
+  // ==========================================
+  // 正解数表示
+  // ==========================================
 
   function updateProgress() {
 
     document.getElementById(
       "progress"
     ).textContent =
+
       `正解数: ${solvedQuestions.size} / ${questions.length}`;
 
   }
 
 
-  // ==============================
-  // ボタン
-  // ==============================
+  // ==========================================
+  // ボタンイベント
+  // ==========================================
 
   document.getElementById(
     "runButton"
@@ -1008,6 +1281,32 @@ id | user_id | product    | amount
     resetInput
   );
 
+
+  // Ctrl + Enter でもSQL実行
+  document.getElementById(
+    "sqlInput"
+  ).addEventListener(
+    "keydown",
+    event => {
+
+      if (
+        event.ctrlKey &&
+        event.key === "Enter"
+      ) {
+
+        event.preventDefault();
+
+        runSQL();
+
+      }
+
+    }
+  );
+
+
+  // ==========================================
+  // アプリ開始
+  // ==========================================
 
   initialize();
 
