@@ -295,10 +295,10 @@
         "users テーブルのすべての列・すべての行を取得してください。",
 
       starter:
-        "SELECT *\nFROM users;",
+        "SELECT *\nFROM users",
 
       answer:
-        "SELECT * FROM users;",
+        "SELECT * FROM users",
 
       schema:
 `users
@@ -320,7 +320,7 @@ id | name   | age
         "SELECT *\nFROM users\nWHERE ",
 
       answer:
-        "SELECT * FROM users WHERE age >= 20;",
+        "SELECT * FROM users WHERE age >= 20",
 
       schema:
 `users
@@ -342,7 +342,7 @@ id | name   | age
         "SELECT *\nFROM users\nORDER BY ",
 
       answer:
-        "SELECT * FROM users ORDER BY age DESC;",
+        "SELECT * FROM users ORDER BY age DESC",
 
       schema:
 `users
@@ -364,7 +364,7 @@ id | name   | age
         "SELECT ",
 
       answer:
-        "SELECT COUNT(*) AS count FROM users;",
+        "SELECT COUNT(*) AS count FROM users",
 
       schema:
 `users
@@ -393,7 +393,7 @@ JOIN orders
 FROM users
 JOIN orders
 ON users.id = orders.user_id
-ORDER BY orders.id;`,
+ORDER BY orders.id`,
 
       schema:
 `users
@@ -434,7 +434,7 @@ FROM users
 JOIN orders
 ON users.id = orders.user_id
 GROUP BY users.id, users.name
-ORDER BY total DESC;`,
+ORDER BY total DESC`,
 
       schema:
 `users
