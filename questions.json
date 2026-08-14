@@ -1,0 +1,44 @@
+[
+  {
+    "title": "問題1：SELECT 基礎",
+    "text": "users テーブルのすべての列・すべての行を取得してください。",
+    "starter": "SELECT *\nFROM users",
+    "answer": "SELECT * FROM users",
+    "schema": "users\n-------------------------\nid | name   | age\n1  | Taro   | 25\n2  | Hanako | 30\n3  | Ken    | 19\n4  | Yuki   | 22"
+  },
+  {
+    "title": "問題2：WHERE",
+    "text": "users テーブルから、age が20以上のユーザーを取得してください。",
+    "starter": "SELECT *\nFROM users\nWHERE ",
+    "answer": "SELECT * FROM users WHERE age >= 20",
+    "schema": "users\n-------------------------\nid | name   | age\n1  | Taro   | 25\n2  | Hanako | 30\n3  | Ken    | 19\n4  | Yuki   | 22"
+  },
+  {
+    "title": "問題3：ORDER BY",
+    "text": "users テーブルを age の高い順に並べてください。",
+    "starter": "SELECT *\nFROM users\nORDER BY ",
+    "answer": "SELECT * FROM users ORDER BY age DESC",
+    "schema": "users\n-------------------------\nid | name   | age\n1  | Taro   | 25\n2  | Hanako | 30\n3  | Ken    | 19\n4  | Yuki   | 22"
+  },
+  {
+    "title": "問題4：COUNT",
+    "text": "users テーブルに何人のユーザーがいるか取得してください。列名は count にしてください。",
+    "starter": "SELECT ",
+    "answer": "SELECT COUNT(*) AS count FROM users",
+    "schema": "users\n-------------------------\nid | name   | age\n1  | Taro   | 25\n2  | Hanako | 30\n3  | Ken    | 19\n4  | Yuki   | 22"
+  },
+  {
+    "title": "問題5：JOIN",
+    "text": "注文したユーザー名、商品名、金額を取得してください。orders.id の昇順で並べてください。",
+    "starter": "SELECT\nFROM users\nJOIN orders\n  ON ",
+    "answer": "SELECT users.name, orders.product, orders.amount\nFROM users\nJOIN orders\nON users.id = orders.user_id\nORDER BY orders.id",
+    "schema": "users\n-------------------------\nid | name   | age\n1  | Taro   | 25\n2  | Hanako | 30\n3  | Ken    | 19\n4  | Yuki   | 22\n\norders\n----------------------------------\nid | user_id | product    | amount\n1  | 1       | Keyboard   | 8000\n2  | 2       | Mouse      | 3000\n3  | 1       | Monitor    | 25000\n4  | 4       | Headphones | 12000"
+  },
+  {
+    "title": "問題6：GROUP BY",
+    "text": "ユーザーごとの注文金額合計を取得してください。name と total を表示し、total の高い順に並べてください。",
+    "starter": "SELECT\nFROM users\nJOIN orders\n  ON\nGROUP BY\nORDER BY ",
+    "answer": "SELECT users.name, SUM(orders.amount) AS total\nFROM users\nJOIN orders\nON users.id = orders.user_id\nGROUP BY users.id, users.name\nORDER BY total DESC",
+    "schema": "users\n-------------------------\nid | name   | age\n1  | Taro   | 25\n2  | Hanako | 30\n3  | Ken    | 19\n4  | Yuki   | 22\n\norders\n----------------------------------\nid | user_id | product    | amount\n1  | 1       | Keyboard   | 8000\n2  | 2       | Mouse      | 3000\n3  | 1       | Monitor    | 25000\n4  | 4       | Headphones | 12000"
+  }
+]
